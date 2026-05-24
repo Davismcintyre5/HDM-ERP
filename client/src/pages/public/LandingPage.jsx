@@ -9,6 +9,7 @@ import CookieConsent from '../../components/public/CookieConsent';
 import PlanCard from '../../components/public/PlanCard';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../components/ui/Spinner';
+import { Monitor, Smartphone } from 'lucide-react';
 
 const LandingPage = () => {
   const [config, setConfig] = useState({});
@@ -93,6 +94,18 @@ const LandingPage = () => {
               ))}
             </div>
           )}
+
+{/* Scrolling Ticker */}
+{(config.desktopApp?.enabled || config.mobileApp?.enabled) && (
+  <div className="mt-8 max-w-2xl mx-auto">
+    <button
+      onClick={() => { const el = document.getElementById('downloads'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}
+      className="animate-pulse text-sm text-primary-500 font-medium hover:text-primary-600 transition-colors"
+    >
+      📱 Download the HDM ERP App — Available on Desktop &amp; Mobile
+    </button>
+  </div>
+)}
         </div>
       </section>
 
@@ -125,23 +138,41 @@ const LandingPage = () => {
               <div key={title} className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 text-center">
                 <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 flex items-center justify-center text-lg font-bold">{letter}</div>
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{title}</h3>
-                <ul className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">
-                  {items.map((item, i) => <li key={i}>• {item}</li>)}
-                </ul>
+                <ul className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">{items.map((item, i) => <li key={i}>• {item}</li>)}</ul>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* DOWNLOADS */}
+      <section id="downloads" className="py-16 bg-white dark:bg-gray-800">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Download HDM ERP</h2>
+          <div className="flex flex-wrap justify-center gap-4">
+            {config.desktopApp?.enabled && (
+              <a href={config.desktopApp.url || '#'} target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2">
+                <Monitor size={20} /> {config.desktopApp.label || 'Download for Desktop'}
+              </a>
+            )}
+            {config.mobileApp?.enabled && (
+              <a href={config.mobileApp.url || '#'} target="_blank" rel="noopener noreferrer" className="px-8 py-4 border-2 border-primary-500 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900 font-semibold rounded-lg transition-colors flex items-center gap-2">
+                <Smartphone size={20} /> {config.mobileApp.label || 'Get on Mobile'}
+              </a>
+            )}
+          </div>
+          {!config.desktopApp?.enabled && !config.mobileApp?.enabled && (
+            <p className="text-gray-400 text-sm">Downloads coming soon.</p>
+          )}
+        </div>
+      </section>
+
       {/* PRICING */}
-      <section id="pricing" className="py-16 bg-white dark:bg-gray-800">
+      <section id="pricing" className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Choose Your Plan</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {plans.map(plan => (
-              <PlanCard key={plan.name} plan={plan} selected={selectedPlan === plan.name} onSelect={handleSelect} />
-            ))}
+            {plans.map(plan => (<PlanCard key={plan.name} plan={plan} selected={selectedPlan === plan.name} onSelect={handleSelect} />))}
           </div>
         </div>
       </section>

@@ -1,0 +1,37 @@
+appId: com.hdmerp.desktop
+productName: HDM ERP
+copyright: © 2026 HDM ERP
+
+directories:
+  output: dist
+  buildResources: assets
+
+files:
+  - electron/**/*
+  - build/**/*
+  - assets/**/*
+  - package.json
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: assets/logo.png
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+mac:
+  target: dmg
+  icon: assets/logo.png
+
+linux:
+  target: AppImage
+  icon: assets/logo.png
+
+publish:
+  provider: generic
+  url: https://hdmerpserver.pxxl.click/downloads

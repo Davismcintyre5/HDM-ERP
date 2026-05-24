@@ -7,7 +7,7 @@ const api = axios.create({
 
 // Attach token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -20,16 +20,18 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (!refreshToken) throw new Error('No refresh token');
-        const { data } = await axios.post(`${api.defaults.baseURL}/public/auth/refresh`, { refreshToken });
+        const rt = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+        if (!rt) throw new Error('No refresh token');
+        const { data } = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/public/auth/refresh`, { refreshToken: rt });
         const newToken = data.data.accessToken;
-        localStorage.setItem('accessToken', newToken);
+        const remember = !!localStorage.getItem('refreshToken');
+        if (remember) localStorage.setItem('accessToken', newToken);
+        else sessionStorage.setItem('accessToken', newToken);
         original.headers.Authorization = `Bearer ${newToken}`;
         return api(original);
       } catch {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        localStorage.clear();
+        sessionStorage.clear();
         window.location.href = '/login';
       }
     }

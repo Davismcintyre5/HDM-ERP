@@ -1,0 +1,55 @@
+import { createContext, useContext, useState, useEffect } from 'react';
+import { queryAI } from '../api/tenant/aiQueryApi';
+import api from '../api/axios';
+
+const AIContext = createContext(null);
+
+export const AIProvider = ({ children }) => {
+  const [chatOpen, setChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [aiEnabled, setAiEnabled] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    api.get('/tenant/ai/settings')
+      .then(res => {
+        // If settings exist and AI is not explicitly disabled, enable
+        setAiEnabled(res.data.data?.enabled !== false);
+      })
+      .catch(() => setAiEnabled(false))
+      .finally(() => setChecked(true));
+  }, []);
+
+  const sendQuery = async (question) => {
+    if (!aiEnabled) return;
+    setLoading(true);
+    const newMessages = [...messages, { role: 'user', content: question }];
+    setMessages(newMessages);
+    try {
+      const { data } = await queryAI(question);
+      const reply = data.data?.reply || data.data?.data?.reply || data?.reply || 'No response available.';
+      setMessages([...newMessages, { role: 'assistant', content: reply }]);
+    } catch (err) {
+      if (err.response?.status === 403) {
+        setAiEnabled(false);
+        setMessages([...newMessages, { role: 'assistant', content: 'AI has been disabled by your administrator.' }]);
+      } else {
+        setMessages([...newMessages, { role: 'assistant', content: 'AI service is currently unavailable.' }]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleChat = () => { if (aiEnabled) setChatOpen(!chatOpen); };
+  const clearChat = () => setMessages([]);
+
+  return (
+    <AIContext.Provider value={{ chatOpen, toggleChat, messages, sendQuery, loading, clearChat, aiEnabled, checked }}>
+      {children}
+    </AIContext.Provider>
+  );
+};
+
+export const useAI = () => useContext(AIContext);
