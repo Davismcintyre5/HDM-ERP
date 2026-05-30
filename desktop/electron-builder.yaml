@@ -3,7 +3,7 @@ productName: HDM ERP
 copyright: © 2026 HDM ERP
 
 directories:
-  output: dist
+  output: release
   buildResources: assets
 
 files:
@@ -31,7 +31,3 @@ mac:
 linux:
   target: AppImage
   icon: assets/logo.png
-
-publish:
-  provider: generic
-  url: https://hdmerpserver.pxxl.click/downloads

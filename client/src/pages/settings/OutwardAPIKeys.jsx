@@ -7,8 +7,9 @@ import Card from '../../components/ui/Card';
 import Modal from '../../components/ui/Modal';
 import Input from '../../components/ui/Input';
 import Badge from '../../components/ui/Badge';
-import CopyButton from '../../components/ui/CopyButton';
-import { Key, Trash2, Plus, Copy } from 'lucide-react';
+import { Key, Trash2, Plus, Copy, Link, Terminal, Check } from 'lucide-react';
+
+const API_BASE = (import.meta.env.VITE_API_URL || 'https://hdmerpserver.pxxl.click/api').replace(/\/api$/, '') + '/api';
 
 const modules = ['finance', 'hr', 'sales', 'inventory', 'supplyChain', 'manufacturing', 'contacts', 'products', 'reports'];
 
@@ -19,7 +20,7 @@ const OutwardAPIKeys = () => {
   const [newKey, setNewKey] = useState({ name: '', scopes: [] });
   const [createdKey, setCreatedKey] = useState(null);
   const [message, setMessage] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [urlCopied, setUrlCopied] = useState(false);
 
   const fetchKeys = () => {
     getOutwardKeys()
@@ -54,10 +55,15 @@ const OutwardAPIKeys = () => {
     }
   };
 
+  const copyUrl = () => {
+    navigator.clipboard.writeText(`${API_BASE}/tenant/ai/outward`);
+    setUrlCopied(true);
+    setTimeout(() => setUrlCopied(false), 2000);
+  };
+
   const copyKey = (text) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setMessage({ type: 'success', text: 'Key copied.' });
   };
 
   if (loading) return <div className="flex justify-center py-10"><Spinner /></div>;
@@ -73,6 +79,35 @@ const OutwardAPIKeys = () => {
 
       {message && <Alert variant={message.type} message={message.text} onClose={() => setMessage('')} />}
 
+      {/* API Base URL Info */}
+      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="flex items-center gap-2 mb-2">
+          <Link size={16} className="text-blue-500" />
+          <span className="text-sm font-semibold text-blue-700 dark:text-blue-300">API Base URL</span>
+        </div>
+        <div className="flex items-center gap-2 bg-white dark:bg-gray-900 rounded px-3 py-2 border border-blue-200 dark:border-blue-800">
+          <code className="flex-1 text-sm text-gray-900 dark:text-gray-100 break-all">{API_BASE}/tenant/ai/outward</code>
+          <button onClick={copyUrl} className="text-blue-500 hover:text-blue-600 shrink-0" title="Copy URL">
+            {urlCopied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+          </button>
+        </div>
+        <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 flex items-center gap-1">
+          <Terminal size={12} />
+          Use this base URL with your API key in the <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded text-xs">x-api-key</code> header.
+        </p>
+      </div>
+
+      {/* Example curl */}
+      <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Example Request</p>
+        <pre className="text-xs text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap">
+{`curl -H "x-api-key: YOUR_KEY_HERE" \\
+  -X POST ${API_BASE}/tenant/ai/outward/query \\
+  -H "Content-Type: application/json" \\
+  -d '{"question":"What is my revenue?"}'`}
+        </pre>
+      </div>
+
       {createdKey && (
         <div className="mb-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
@@ -82,15 +117,15 @@ const OutwardAPIKeys = () => {
           <p className="text-xs text-emerald-600 dark:text-emerald-400 mb-2">Copy it now — it won't be shown again.</p>
           <div className="flex items-center gap-2 bg-white dark:bg-gray-900 rounded-lg px-3 py-2 border border-emerald-200 dark:border-emerald-800">
             <code className="flex-1 text-xs text-gray-900 dark:text-gray-100 break-all">{createdKey.key}</code>
-            <button onClick={() => copyKey(createdKey.key)} className="p-1 text-emerald-500 hover:text-emerald-600" title="Copy">
-              {copied ? <span className="text-xs text-emerald-500">Copied!</span> : <Copy size={14} />}
+            <button onClick={() => copyKey(createdKey.key)} className="p-1 text-emerald-500 hover:text-emerald-600 shrink-0" title="Copy">
+              <Copy size={14} />
             </button>
           </div>
           <button onClick={() => setCreatedKey(null)} className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-2">Dismiss</button>
         </div>
       )}
 
-      {keys.length === 0 ? (
+      {keys.length === 0 && !createdKey ? (
         <div className="text-center py-10 text-gray-400">
           <Key size={32} className="mx-auto mb-2 opacity-50" />
           <p className="text-sm">No API keys yet</p>
@@ -101,11 +136,11 @@ const OutwardAPIKeys = () => {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="text-left py-2 text-gray-500 dark:text-gray-400 font-medium text-xs">Name</th>
-                <th className="text-left py-2 text-gray-500 dark:text-gray-400 font-medium text-xs">Prefix</th>
-                <th className="text-left py-2 text-gray-500 dark:text-gray-400 font-medium text-xs">Scopes</th>
-                <th className="text-left py-2 text-gray-500 dark:text-gray-400 font-medium text-xs">Last Used</th>
-                <th className="text-right py-2 text-gray-500 dark:text-gray-400 font-medium text-xs">Actions</th>
+                <th className="py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">Name</th>
+                <th className="py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">Prefix</th>
+                <th className="py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">Scopes</th>
+                <th className="py-2 text-left text-gray-500 dark:text-gray-400 font-medium text-xs">Last Used</th>
+                <th className="py-2 text-right text-gray-500 dark:text-gray-400 font-medium text-xs">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -140,6 +175,7 @@ const OutwardAPIKeys = () => {
         </div>
       )}
 
+      {/* Generate Modal */}
       <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Generate API Key">
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
