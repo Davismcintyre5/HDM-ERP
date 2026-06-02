@@ -1,13 +1,13 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { initAutoUpdater } = require('./utils/autoUpdater');
 const { createTray } = require('./tray/trayManager');
 const { registerIpcHandlers } = require('./ipc/ipcHandlers');
 
 let mainWindow = null;
-let tray = null;
+let isOnline = true;
 
-const isDev = !app.isPackaged;
+const CLIENT_URL = 'https://hdmerp.pxxl.click/login?electron=true';
 
 function createWindow() {
   const windowState = require('./utils/windowManager').getWindowState();
@@ -21,31 +21,34 @@ function createWindow() {
     icon: path.join(__dirname, '..', 'assets', 'logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false,
       contextIsolation: true,
+      nodeIntegration: false,
     },
     backgroundColor: '#f9fafb',
     show: false,
   });
 
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:3000/login?electron=true');
-    mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadURL('https://hdmerp.pxxl.click/login?electron=true');
-  }
+  mainWindow.loadURL(CLIENT_URL);
 
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
-  });
-
+  mainWindow.once('ready-to-show', () => { mainWindow.show(); });
   mainWindow.on('resize', () => require('./utils/windowManager').saveWindowState(mainWindow));
   mainWindow.on('move', () => require('./utils/windowManager').saveWindowState(mainWindow));
   mainWindow.on('closed', () => { mainWindow = null; });
 
-  tray = createTray(mainWindow);
-  if (!isDev) initAutoUpdater(mainWindow);
+  createTray(mainWindow);
+  initAutoUpdater(mainWindow);
 }
+
+function checkOnlineStatus() {
+  return require('dns').promises.resolve('hdmerpserver.pxxl.click').then(() => true).catch(() => false);
+}
+
+setInterval(async () => {
+  isOnline = await checkOnlineStatus();
+  if (mainWindow) mainWindow.webContents.send('online-status', isOnline);
+}, 10000);
+
+ipcMain.handle('get-online-status', () => isOnline);
 
 registerIpcHandlers();
 
@@ -60,9 +63,8 @@ app.on('activate', () => {
 });
 
 const gotLock = app.requestSingleInstanceLock();
-if (!gotLock) {
-  app.quit();
-} else {
+if (!gotLock) { app.quit(); }
+else {
   app.on('second-instance', () => {
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();

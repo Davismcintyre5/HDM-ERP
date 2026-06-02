@@ -11,6 +11,7 @@ export const TenantProvider = ({ children }) => {
   const [limits, setLimits] = useState({});
   const [plan, setPlan] = useState(null);
   const fetchedRef = useRef(false);
+  const lastFetchRef = useRef(0);
 
   const fetchTenantData = useCallback(async () => {
     try {
@@ -35,8 +36,9 @@ export const TenantProvider = ({ children }) => {
       return;
     }
 
-    if (fetchedRef.current) return;
-    fetchedRef.current = true;
+    // Cache for 5 minutes
+    if (Date.now() - lastFetchRef.current < 300000) return;
+    lastFetchRef.current = Date.now();
     fetchTenantData();
   }, [isAuthenticated, token, fetchTenantData]);
 
@@ -45,6 +47,7 @@ export const TenantProvider = ({ children }) => {
       const modulesRes = await api.get('/tenant/company/modules');
       setModules(modulesRes.data.data.modules || modulesRes.data.data.planModules || {});
       setPlan(modulesRes.data.data.plan);
+      lastFetchRef.current = Date.now();
     } catch {}
   }, []);
 

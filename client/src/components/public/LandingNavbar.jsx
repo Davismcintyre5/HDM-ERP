@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Sun, Moon, Menu, X, ChevronDown } from 'lucide-react';
 import Button from '../ui/Button';
 
 const LandingNavbar = ({ config, onOpenLegal, onOpenContact }) => {
+  const { isAuthenticated, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
@@ -48,8 +50,15 @@ const LandingNavbar = ({ config, onOpenLegal, onOpenContact }) => {
             </div>
             <a href="#pricing" onClick={(e) => { e.preventDefault(); scrollTo('pricing'); }} className="text-sm font-medium text-primary-500 hover:text-primary-600">Pricing</a>
             <Button variant="ghost" onClick={toggleTheme}>{theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}</Button>
-            <Link to="/login"><Button variant="outline">Login</Button></Link>
-            <Link to="/pricing"><Button>Get Started</Button></Link>
+
+            {isAuthenticated ? (
+              <Link to="/dashboard"><Button>🚀 Launch App</Button></Link>
+            ) : (
+              <>
+                <Link to="/login"><Button variant="outline">Login</Button></Link>
+                <Link to="/pricing"><Button>Get Started</Button></Link>
+              </>
+            )}
           </div>
 
           <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
@@ -70,8 +79,14 @@ const LandingNavbar = ({ config, onOpenLegal, onOpenContact }) => {
           <button onClick={() => { onOpenLegal('privacy_policy'); setMobileOpen(false); }} className="block w-full text-left py-2 text-sm text-gray-600 dark:text-gray-300">Privacy</button>
           <button onClick={() => { onOpenLegal('terms_of_service'); setMobileOpen(false); }} className="block w-full text-left py-2 text-sm text-gray-600 dark:text-gray-300">Terms</button>
           <div className="pt-2 space-y-2">
-            <Link to="/login" className="block w-full"><Button variant="outline" className="w-full">Login</Button></Link>
-          <Link to="/pricing" className="block w-full"><Button className="w-full">Get Started</Button></Link>
+            {isAuthenticated ? (
+              <Link to="/dashboard" className="block w-full"><Button className="w-full">🚀 Launch App</Button></Link>
+            ) : (
+              <>
+                <Link to="/login" className="block w-full"><Button variant="outline" className="w-full">Login</Button></Link>
+                <Link to="/pricing" className="block w-full"><Button className="w-full">Get Started</Button></Link>
+              </>
+            )}
           </div>
         </div>
       )}

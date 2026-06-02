@@ -18,15 +18,12 @@ export const AIProvider = ({ children }) => {
       return;
     }
 
+    // Check once on mount, then never again
     api.get('/tenant/ai/settings')
-      .then(res => {
-        setAiEnabled(res.data.data?.enabled !== false);
-      })
-      .catch(() => {
-        setAiEnabled(false);
-      })
+      .then(res => setAiEnabled(res.data.data?.enabled !== false))
+      .catch(() => setAiEnabled(false))
       .finally(() => setChecked(true));
-  }, []);
+  }, []); // Empty dependency — runs once
 
   const sendQuery = async (question) => {
     if (!aiEnabled) return;
@@ -35,15 +32,11 @@ export const AIProvider = ({ children }) => {
     setMessages(newMessages);
     try {
       const { data } = await queryAI(question);
-      const reply = data.data?.reply || data.data?.data?.reply || data?.reply || 'No response available.';
+      const reply = data.data?.reply || data.data?.data?.reply || data?.reply || 'No response';
       setMessages([...newMessages, { role: 'assistant', content: reply }]);
     } catch (err) {
-      if (err.response?.status === 403) {
-        setAiEnabled(false);
-        setMessages([...newMessages, { role: 'assistant', content: 'AI has been disabled by your administrator.' }]);
-      } else {
-        setMessages([...newMessages, { role: 'assistant', content: 'AI service is currently unavailable.' }]);
-      }
+      if (err.response?.status === 403) setAiEnabled(false);
+      setMessages([...newMessages, { role: 'assistant', content: 'AI unavailable' }]);
     } finally {
       setLoading(false);
     }

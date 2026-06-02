@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2310B981'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Arial,sans-serif' font-size='42' font-weight='900' fill='white'>HDM</text></svg>">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HDM ERP — Complete User Guide v1.0</title>
+    <style>
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --secondary: #1E3A5F;
+            --bg: #f9fafb;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --white: #ffffff;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --warning-bg: #fef3c7;
+            --warning-border: #f59e0b;
+            --info-bg: #dbeafe;
+            --info-border: #3b82f6;
+            --tip-bg: #d1fae5;
+            --tip-border: #10B981;
+            --danger-bg: #fee2e2;
+            --danger-border: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.7;
+            counter-reset: page;
+        }
+
+        /* COVER PAGE */
+        .cover-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+            page-break-after: always;
+            position: relative;
+        }
+        .cover-page::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10 L90 10 L90 90 L10 90 Z" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></svg>') repeat;
+            opacity: 0.3;
+        }
+        .cover-page > * { position: relative; z-index: 1; }
+        .cover-page .logo {
+            font-size: 100px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+        .cover-page .title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .cover-page .subtitle {
+            font-size: 22px;
+            opacity: 0.95;
+            margin-bottom: 50px;
+            max-width: 600px;
+        }
+        .cover-page .meta {
+            font-size: 16px;
+            opacity: 0.85;
+            margin-top: 60px;
+        }
+        .cover-page .version {
+            display: inline-block;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 30px;
+            padding: 8px 28px;
+            font-size: 16px;
+            margin-top: 25px;
+            letter-spacing: 2px;
+        }
+
+        /* DEVELOPERS PAGE */
+        .developers-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 80px;
+            background: var(--white);
+            page-break-after: always;
+        }
+        .developers-page h1 {
+            color: var(--primary);
+            font-size: 38px;
+            margin-bottom: 35px;
+            border-bottom: 4px solid var(--primary);
+            padding-bottom: 15px;
+        }
+        .dev-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .dev-card {
+            padding: 30px;
+            background: var(--bg);
+            border-radius: 16px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .dev-card h3 {
+            color: var(--secondary);
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+        .dev-card .role {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        .dev-card p {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .dev-card a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info {
+            margin-top: 20px;
+            padding: 25px;
+            background: var(--bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .contact-info h3 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        .contact-info p {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        /* TABLE OF CONTENTS */
+        .toc-page {
+            min-height: 100vh;
+            padding: 60px 80px;
+            background: var(--white);
+            page-break-after: always;
+        }
+        .toc-page h1 {
+            color: var(--primary);
+            font-size: 38px;
+            margin-bottom: 35px;
+            border-bottom: 4px solid var(--primary);
+            padding-bottom: 15px;
+        }
+        .toc-list { list-style: none; }
+        .toc-list li {
+            padding: 12px 0;
+            border-bottom: 1px dotted var(--border);
+        }
+        .toc-list li a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 17px;
+            display: flex;
+            justify-content: space-between;
+            transition: color 0.2s;
+        }
+        .toc-list li a:hover { color: var(--primary); }
+        .toc-level-2 { padding-left: 35px; font-size: 15px; color: var(--muted); }
+        .toc-level-2 a { font-weight: 400; }
+
+        /* ACKNOWLEDGEMENT & DEDICATION */
+        .acknowledgement-page, .dedication-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 80px;
+            background: var(--white);
+            page-break-after: always;
+        }
+        .acknowledgement-page h1, .dedication-page h1 {
+            color: var(--primary);
+            font-size: 38px;
+            margin-bottom: 35px;
+        }
+        .acknowledgement-page p, .dedication-page p {
+            font-size: 18px;
+            line-height: 2;
+            max-width: 800px;
+        }
+        .dedication-page { text-align: center; align-items: center; background: var(--bg); }
+
+        /* LICENSE */
+        .license-page {
+            min-height: 100vh;
+            padding: 60px 80px;
+            background: var(--white);
+            page-break-after: always;
+        }
+        .license-page h1 { color: var(--primary); font-size: 38px; margin-bottom: 35px; }
+        .license-page pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 25px;
+            border-radius: 12px;
+            font-size: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+        .main-content h1 {
+            color: var(--primary);
+            font-size: 34px;
+            margin: 50px 0 25px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            page-break-before: always;
+        }
+        .main-content h2 {
+            color: var(--secondary);
+            font-size: 26px;
+            margin: 35px 0 18px;
+        }
+        .main-content h3 {
+            color: var(--text);
+            font-size: 20px;
+            margin: 25px 0 12px;
+        }
+        .main-content p { margin-bottom: 18px; font-size: 16px; }
+        .main-content ul, .main-content ol { margin: 12px 0 25px 35px; }
+        .main-content li { margin-bottom: 10px; font-size: 16px; }
+        .note {
+            background: var(--info-bg);
+            border-left: 5px solid var(--info-border);
+            padding: 18px 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-size: 15px;
+        }
+        .warning {
+            background: var(--warning-bg);
+            border-left: 5px solid var(--warning-border);
+            padding: 18px 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-size: 15px;
+        }
+        .tip {
+            background: var(--tip-bg);
+            border-left: 5px solid var(--tip-border);
+            padding: 18px 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-size: 15px;
+        }
+        .danger {
+            background: var(--danger-bg);
+            border-left: 5px solid var(--danger-border);
+            padding: 18px 25px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-size: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 15px;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 14px 18px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:hover td { background: var(--bg); }
+
+        .step {
+            display: flex;
+            gap: 18px;
+            margin: 25px 0;
+            align-items: flex-start;
+        }
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .step-content { flex: 1; }
+        .step-content strong { display: block; margin-bottom: 6px; font-size: 17px; }
+
+        .footer {
+            text-align: center;
+            padding: 50px;
+            color: var(--muted);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+            margin-top: 80px;
+            page-break-before: always;
+        }
+
+        @media print {
+            body { font-size: 12px; }
+            .main-content { max-width: 100%; padding: 20px; }
+            .cover-page, .developers-page, .toc-page, .acknowledgement-page, .dedication-page, .license-page {
+                min-height: 100vh;
+                page-break-after: always;
+            }
+            .main-content h1 { page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== COVER PAGE ==================== -->
+<div class="cover-page">
+    <div style="margin-bottom: 20px;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="140" height="140">
+    <rect width="100" height="100" rx="20" fill="#10B981"/>
+    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="900" fill="white">HDM</text>
+  </svg>
+</div>
+    <div class="title">Enterprise Resource Planning</div>
+    <div class="subtitle">Complete User Guide — All Modules &amp; Features</div>
+    <div class="version">Version 1.0 — May 2026</div>
+    <div class="meta">
+        <p>Smart Business Management Powered by AI</p>
+        <p>https://hdmerp.pxxl.click</p>
+    </div>
+</div>
+
+<!-- ==================== DEVELOPERS INFO ==================== -->
+<div class="developers-page">
+    <h1>Development Team</h1>
+    <div class="dev-grid">
+        <div class="dev-card">
+            <h3>Davix HDM</h3>
+            <p class="role">Lead Developer — Backend &amp; System Architecture</p>
+            <p><strong>Email:</strong> davismcintyre5@gmail.com</p>
+            <p><strong>Phone:</strong> +254 768 784 909</p>
+            <p><strong>GitHub:</strong> <a href="https://github.com/Davismcintyre5" target="_blank">github.com/Davismcintyre5</a></p>
+            <p>Responsible for server infrastructure, API design, database architecture, multi-tenant isolation, AI integration, and deployment.</p>
+        </div>
+        <div class="dev-card">
+            <h3>Caro Asha</h3>
+            <p class="role">Frontend Developer — Admin Panel</p>
+            <p><strong>Email:</strong> carolineashaesekon@gmail.com</p>
+            <p><strong>GitHub:</strong> <a href="https://github.com/CaroAsha" target="_blank">github.com/CaroAsha</a></p>
+            <p>Responsible for the Super Admin dashboard, tenant management, payment approvals, plans configuration, and admin settings interface.</p>
+        </div>
+    </div>
+    <div class="contact-info">
+        <h3>Developer Resources</h3>
+        <p><strong>Developers Website:</strong> <a href="https://hdmdevelopers.pxxl.click" target="_blank">hdmdevelopers.pxxl.click</a></p>
+        <p><strong>API Server:</strong> https://hdmerpserver.pxxl.click</p>
+        <p><strong>Support Email:</strong> support@hdmerp.com</p>
+        <p><strong>Support Phone:</strong> +254 768 784 909</p>
+    </div>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<div class="toc-page">
+    <h1>Table of Contents</h1>
+    <ul class="toc-list">
+        <li><a href="#s1">1. Getting Started</a></li>
+        <li class="toc-level-2"><a href="#s1-1">1.1 System Requirements</a></li>
+        <li class="toc-level-2"><a href="#s1-2">1.2 Accessing HDM ERP</a></li>
+        <li class="toc-level-2"><a href="#s1-3">1.3 Registration &amp; Activation</a></li>
+        <li class="toc-level-2"><a href="#s1-4">1.4 Logging In</a></li>
+        <li class="toc-level-2"><a href="#s1-5">1.5 Dashboard Overview</a></li>
+        <li><a href="#s2">2. Finance Module</a></li>
+        <li class="toc-level-2"><a href="#s2-1">2.1 Chart of Accounts</a></li>
+        <li class="toc-level-2"><a href="#s2-2">2.2 Journal Entries</a></li>
+        <li class="toc-level-2"><a href="#s2-3">2.3 Invoices</a></li>
+        <li class="toc-level-2"><a href="#s2-4">2.4 Bills</a></li>
+        <li class="toc-level-2"><a href="#s2-5">2.5 Revenue &amp; Expenses</a></li>
+        <li class="toc-level-2"><a href="#s2-6">2.6 Financial Reports</a></li>
+        <li><a href="#s3">3. HR Module</a></li>
+        <li class="toc-level-2"><a href="#s3-1">3.1 Employees</a></li>
+        <li class="toc-level-2"><a href="#s3-2">3.2 Attendance</a></li>
+        <li class="toc-level-2"><a href="#s3-3">3.3 Leave Management</a></li>
+        <li class="toc-level-2"><a href="#s3-4">3.4 Payroll</a></li>
+        <li class="toc-level-2"><a href="#s3-5">3.5 Recruitment</a></li>
+        <li><a href="#s4">4. Sales Module</a></li>
+        <li class="toc-level-2"><a href="#s4-1">4.1 Sales Orders</a></li>
+        <li class="toc-level-2"><a href="#s4-2">4.2 Quotations</a></li>
+        <li class="toc-level-2"><a href="#s4-3">4.3 Pricing</a></li>
+        <li><a href="#s5">5. Inventory Module</a></li>
+        <li class="toc-level-2"><a href="#s5-1">5.1 Stock Overview</a></li>
+        <li class="toc-level-2"><a href="#s5-2">5.2 Stock Movements</a></li>
+        <li class="toc-level-2"><a href="#s5-3">5.3 Warehouses</a></li>
+        <li class="toc-level-2"><a href="#s5-4">5.4 Stock Transfers</a></li>
+        <li><a href="#s6">6. Supply Chain Module</a></li>
+        <li class="toc-level-2"><a href="#s6-1">6.1 Purchase Orders</a></li>
+        <li class="toc-level-2"><a href="#s6-2">6.2 Goods Receiving</a></li>
+        <li class="toc-level-2"><a href="#s6-3">6.3 Suppliers</a></li>
+        <li class="toc-level-2"><a href="#s6-4">6.4 Requisitions</a></li>
+        <li><a href="#s7">7. Manufacturing Module</a></li>
+        <li class="toc-level-2"><a href="#s7-1">7.1 Bill of Materials (BOM)</a></li>
+        <li class="toc-level-2"><a href="#s7-2">7.2 Work Orders</a></li>
+        <li class="toc-level-2"><a href="#s7-3">7.3 Shop Floor Terminal</a></li>
+        <li class="toc-level-2"><a href="#s7-4">7.4 Quality Control</a></li>
+        <li><a href="#s8">8. Contacts &amp; Products</a></li>
+        <li><a href="#s9">9. Orders (Unified View)</a></li>
+        <li><a href="#s10">10. Reports</a></li>
+        <li><a href="#s11">11. Settings</a></li>
+        <li class="toc-level-2"><a href="#s11-1">11.1 Company Settings</a></li>
+        <li class="toc-level-2"><a href="#s11-2">11.2 User Management</a></li>
+        <li class="toc-level-2"><a href="#s11-3">11.3 Module Toggles</a></li>
+        <li class="toc-level-2"><a href="#s11-4">11.4 AI Settings</a></li>
+        <li class="toc-level-2"><a href="#s11-5">11.5 API Keys</a></li>
+        <li class="toc-level-2"><a href="#s11-6">11.6 Billing &amp; Plans</a></li>
+        <li class="toc-level-2"><a href="#s11-7">11.7 Security</a></li>
+        <li class="toc-level-2"><a href="#s11-8">11.8 Backups</a></li>
+        <li><a href="#s12">12. AI Assistant</a></li>
+        <li><a href="#s13">13. Desktop &amp; Mobile Apps</a></li>
+        <li><a href="#s14">14. Frequently Asked Questions</a></li>
+        <li><a href="#s15">15. Troubleshooting</a></li>
+    </ul>
+</div>
+
+<!-- ==================== ACKNOWLEDGEMENT ==================== -->
+<div class="acknowledgement-page">
+    <h1>Acknowledgement</h1>
+    <p>We express our sincere gratitude to everyone who contributed to the development of HDM ERP — from the core developers to the beta testers who provided invaluable feedback. Your dedication helped shape this platform into a robust, user-friendly system.</p>
+    <p>Special thanks to the open-source community for the tools and libraries that made this project possible: Node.js, React, MongoDB, Express, TailwindCSS, and many more.</p>
+    <p>Thank you to all our early adopters who trusted HDM ERP to manage their businesses. Your support drives us to keep improving.</p>
+    <p><strong>— The HDM ERP Development Team</strong></p>
+</div>
+
+<!-- ==================== DEDICATION ==================== -->
+<div class="dedication-page">
+    <h1>Dedication</h1>
+    <p>This project is dedicated to every business owner, entrepreneur, and manager who strives to build something meaningful.</p>
+    <p>May this tool empower you to manage smarter, grow faster, and achieve your vision.</p>
+    <p><strong>"Smart Business Management"</strong></p>
+</div>
+
+<!-- ==================== LICENSE ==================== -->
+<div class="license-page">
+    <h1>License Agreement</h1>
+    <p><strong>HDM ERP — Enterprise Resource Planning Software</strong></p>
+    <p>Copyright © 2026 HDM ERP. All rights reserved.</p>
+    <p>This software is licensed, not sold. By using HDM ERP, you agree to the following terms:</p>
+    <ul>
+        <li>You may not redistribute, modify, or reverse engineer the software.</li>
+        <li>The license is non-transferable and tied to your company account.</li>
+        <li>HDM ERP is provided "as is" without warranty of any kind.</li>
+        <li>We reserve the right to suspend accounts that violate these terms.</li>
+    </ul>
+    <p>For full license details, visit: <a href="https://hdmerp.pxxl.click/legal/license">https://hdmerp.pxxl.click/legal/license</a></p>
+</div>
+
+<!-- ==================== MAIN USER GUIDE CONTENT ==================== -->
+<div class="main-content">
+
+    <!-- ========== SECTION 1: GETTING STARTED ========== -->
+    <h1 id="s1">1. Getting Started</h1>
+
+    <h2 id="s1-1">1.1 System Requirements</h2>
+    <table>
+        <tr><th>Platform</th><th>Requirements</th></tr>
+        <tr><td>Web Browser</td><td>Chrome 90+, Firefox 88+, Edge 90+, Safari 14+</td></tr>
+        <tr><td>Desktop App</td><td>Windows 10+, macOS 11+, Linux (AppImage)</td></tr>
+        <tr><td>Mobile App</td><td>Android 8+, iOS 14+</td></tr>
+        <tr><td>Internet</td><td>Stable connection for real-time data sync</td></tr>
+    </table>
+
+    <h2 id="s1-2">1.2 Accessing HDM ERP</h2>
+    <p>HDM ERP is available on multiple platforms:</p>
+    <ul>
+        <li><strong>Web App:</strong> <a href="https://hdmerp.pxxl.click">https://hdmerp.pxxl.click</a></li>
+        <li><strong>Admin Panel:</strong> Accessible by super admins for system configuration</li>
+        <li><strong>Desktop App:</strong> Download from the landing page (Windows/Mac/Linux)</li>
+        <li><strong>Mobile App:</strong> Available on Google Play Store &amp; Apple App Store</li>
+    </ul>
+
+    <h2 id="s1-3">1.3 Registration &amp; Activation</h2>
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+            <strong>Register Your Company</strong>
+            <p>Click "Get Started" on the landing page. Choose a plan (Free Trial, Standard, Pro, or Enterprise). Fill in your company name, your full name, email, phone number, and password.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+            <strong>Complete Payment (Paid Plans)</strong>
+            <p>Choose your payment method: M-Pesa (STK Push, Send Money, Paybill, or Till) or Stripe (credit/debit card). Follow the instructions and submit.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+            <strong>Get Your License Key</strong>
+            <p>For Free Trial: you receive a license key immediately. For paid plans: the admin approves your payment and you receive the key via email.</p>
+        </div>
+    </div>
+    <div class="step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+            <strong>Activate Your Device</strong>
+            <p>Open the activation page. Enter your license key. Your device is now trusted and you can log in.</p>
+        </div>
+    </div>
+    <div class="note"><strong>Note:</strong> Keep your license key safe. You'll need it if you switch devices or clear your browser data.</div>
+
+    <h2 id="s1-4">1.4 Logging In</h2>
+    <p>Enter your registered email and password. Check "Remember me" to stay logged in on this device. If you're on a new device, you'll need to activate it first with your license key.</p>
+
+    <h2 id="s1-5">1.5 Dashboard Overview</h2>
+    <p>The dashboard is your home screen. It shows:</p>
+    <ul>
+        <li><strong>Total Customers</strong> — Number of customers in your database</li>
+        <li><strong>Open Invoices</strong> — Unpaid invoices and their total</li>
+        <li><strong>Revenue</strong> — Total income from paid invoices and payments</li>
+        <li><strong>Low Stock Items</strong> — Products below reorder level</li>
+        <li><strong>Cash Flow</strong> — Income vs Expenses summary</li>
+        <li><strong>Recent Orders</strong> — Latest 5 sales orders</li>
+    </ul>
+    <p>Use the sidebar to navigate between modules. Only modules enabled for your plan are visible.</p>
+
+    <!-- ========== SECTION 2: FINANCE ========== -->
+    <h1 id="s2">2. Finance Module</h1>
+    <p>The Finance module is the core of your accounting system. It follows double-entry bookkeeping — every transaction must balance (debits = credits).</p>
+
+    <h2 id="s2-1">2.1 Chart of Accounts</h2>
+    <p>Accounts are categories for your financial transactions. Types include: Asset, Liability, Equity, Income, Expense, and Cost of Sales.</p>
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content"><strong>Add an Account:</strong> Go to Finance → Accounts. Click "+ Add Account". Enter a unique Code, Name, Type, Description, and Opening Balance. Click Create.</div>
+    </div>
+    <p>The account balance updates automatically when journal entries are posted.</p>
+
+    <h2 id="s2-2">2.2 Journal Entries</h2>
+    <p>Journal entries record double-entry transactions. Every financial event (revenue, expense, invoice payment, bill payment, payroll) creates a journal entry.</p>
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content"><strong>Add Manual Entry:</strong> Go to Finance → Journal. Click "+ New Entry". Enter Date, Description, and optional Reference. Add at least 2 lines — select an account, enter Debit or Credit amount. Total Debits must equal Total Credits. Click "Post Entry".</div>
+    </div>
+    <div class="warning"><strong>Important:</strong> Debits must always equal Credits. The system will not allow unbalanced entries.</div>
+
+    <h2 id="s2-3">2.3 Invoices</h2>
+    <p>Invoices bill your customers for goods or services. Status flow: Draft → Sent → Paid (or Cancelled).</p>
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content"><strong>Create Invoice:</strong> Go to Finance → Invoices. Click "+ Create Invoice". Search/select or type a Customer name. Set Invoice Date and Due Date. Add line items (description, quantity, unit price, tax rate). Click Create.</div>
+    </div>
+    <p><strong>Actions:</strong> Send (changes to Sent), Mark Paid (auto-creates journal entry: Debit Cash, Credit Revenue), Cancel, Print.</p>
+
+    <h2 id="s2-4">2.4 Bills</h2>
+    <p>Bills record what you owe to suppliers. Status flow: Draft → Open → Paid (or Void).</p>
+    <p>Similar to invoices but for your expenses. When marked as Paid, the system creates a journal entry: Debit Expense, Credit Cash.</p>
+
+    <h2 id="s2-5">2.5 Revenue &amp; Expenses</h2>
+    <p>Record money coming in (Revenue) and money going out (Expenses).</p>
+    <ul>
+        <li><strong>Record Revenue:</strong> Select an Income account, enter the Payer name, Amount, and Payment Method.</li>
+        <li><strong>Record Expense:</strong> Select an Expense account, enter the Payee name, Amount, and Payment Method.</li>
+    </ul>
+    <p>Each entry auto-creates a journal entry and updates account balances.</p>
+
+    <h2 id="s2-6">2.6 Financial Reports</h2>
+    <p>Located under Finance → Reports tab:</p>
+    <ul>
+        <li><strong>Profit &amp; Loss:</strong> Revenue – Expenses = Net Profit</li>
+        <li><strong>Balance Sheet:</strong> Assets = Liabilities + Equity</li>
+        <li><strong>Trial Balance:</strong> All accounts with debit and credit balances</li>
+    </ul>
+    <p>All reports use live data. Each report has a Print button.</p>
+
+    <!-- ========== SECTION 3: HR ========== -->
+    <h1 id="s3">3. HR Module</h1>
+
+    <h2 id="s3-1">3.1 Employees</h2>
+    <p>Maintain employee records including name, email, phone, department, position, employment type, hire date, and basic salary. Each employee row has View, Print, Edit, and Delete actions. Click an employee card to see full details.</p>
+
+    <h2 id="s3-2">3.2 Attendance</h2>
+    <p>Track clock-in/clock-out times. Select an employee, set the date, and enter check-in and check-out times. You can view attendance history and print reports.</p>
+
+    <h2 id="s3-3">3.3 Leave Management</h2>
+    <p>Employees request leave by selecting the type (Annual, Sick, Maternity, Paternity, Unpaid), start and end dates, and a reason. Managers see pending requests with Approve/Reject buttons. Approved leave is recorded in the system.</p>
+
+    <h2 id="s3-4">3.4 Payroll</h2>
+    <p>Run payroll for a specific period. Set the period start, period end, and payment date. Each employee's basic pay, allowances, and deductions are loaded automatically. You can add or edit allowances and deductions per run. Click "Run Payroll" — the system creates journal entries automatically (Debit Salary Expense, Credit Cash).</p>
+
+    <h2 id="s3-5">3.5 Recruitment</h2>
+    <p>Post job openings with title, department, type, location, salary range, description, duties, qualifications, requirements, and application method. You can specify how candidates should apply: via email, online portal, hand delivery, or both. Each job posting can be viewed in detail, printed as a formal job letter, shared, edited, closed, or deleted. The printed letter includes numbered duties and qualifications with the company header and footer.</p>
+
+    <!-- ========== SECTION 4: SALES ========== -->
+    <h1 id="s4">4. Sales Module</h1>
+
+    <h2 id="s4-1">4.1 Sales Orders</h2>
+    <p>Sales orders track customer purchases. Status flow: Draft → Confirmed → Processing → Shipped → Delivered → Invoiced → Paid (or Cancelled).</p>
+    <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content"><strong>Create Order:</strong> Go to Sales → Orders. Click "+ New Order". Select a customer (search existing or type a new name). Set the order date. Add line items: search/select products, enter quantity, price, discount, and tax rate. The system calculates subtotal, tax, and grand total automatically. Click "Create Order".</div>
+    </div>
+    <p>Each order has a dynamic status button (e.g., "Confirm", "Ship", "Deliver"). Click to advance the order through the workflow. You can also print the order.</p>
+
+    <h2 id="s4-2">4.2 Quotations</h2>
+    <p>Quotations are price estimates for customers before they commit to a purchase. Create a quotation with customer details and items. If the customer accepts, click "Convert to Order" to turn it into a Sales Order instantly.</p>
+
+    <h2 id="s4-3">4.3 Pricing</h2>
+    <p>Manage product selling prices. The pricing tab shows all products with their cost price, selling price, and margin percentage. Click "Edit Price" on any row to update the selling price directly.</p>
+
+    <!-- ========== SECTION 5: INVENTORY ========== -->
+    <h1 id="s5">5. Inventory Module</h1>
+
+    <h2 id="s5-1">5.1 Stock Overview</h2>
+    <p>View real-time stock levels for all products. Products below the reorder level are highlighted in red. You can filter by category and search by name or SKU. Use the "Add Product" button to create new products with name, SKU (auto-generated if blank), category, type, unit, cost price, selling price, and reorder level.</p>
+
+    <h2 id="s5-2">5.2 Stock Movements</h2>
+    <p>Record stock in/out with different movement types: Receipt, Issue, Transfer In, Transfer Out, Adjustment, Return, Production, Consumption. Select a product, choose the movement type, optionally select a warehouse, enter quantity and unit cost. Stock levels update immediately.</p>
+
+    <h2 id="s5-3">5.3 Warehouses</h2>
+    <p>Manage storage locations. Add warehouses with a code, name, and address. Click a warehouse card to view products stored in it, along with their quantities. You can edit or delete warehouses.</p>
+
+    <h2 id="s5-4">5.4 Stock Transfers</h2>
+    <p>Move stock between warehouses. Select a product, the source warehouse, the destination warehouse, and the quantity. The system creates two movements: a transfer out from the source and a transfer in to the destination.</p>
+
+    <!-- ========== SECTION 6: SUPPLY CHAIN ========== -->
+    <h1 id="s6">6. Supply Chain Module</h1>
+
+    <h2 id="s6-1">6.1 Purchase Orders</h2>
+    <p>Create purchase orders to order goods from suppliers. Select a supplier, set the order date and expected delivery date. Add line items by searching/selecting products and entering quantity and unit price. The system calculates the total automatically.</p>
+
+    <h2 id="s6-2">6.2 Goods Receiving</h2>
+    <p>Receive goods against a purchase order. Select the PO, choose the receiving warehouse, and enter the quantities received for each item. The system creates inventory movements (type: receipt) and updates stock levels. If all items are fully received, the PO status changes to "delivered".</p>
+
+    <h2 id="s6-3">6.3 Suppliers</h2>
+    <p>Manage supplier contacts. Add suppliers with company name, contact person, email, and phone. Suppliers are shared with the Contacts module. You can edit or delete suppliers from this tab.</p>
+
+    <h2 id="s6-4">6.4 Requisitions</h2>
+    <p>Create internal purchase requests. Select a product, enter the quantity, reason, requester name, department, and priority (Low, Medium, High). Requisitions can be reviewed before being converted to purchase orders.</p>
+
+    <!-- ========== SECTION 7: MANUFACTURING ========== -->
+    <h1 id="s7">7. Manufacturing Module</h1>
+    <p class="note">Manufacturing is available on Pro and Enterprise plans only.</p>
+
+    <h2 id="s7-1">7.1 Bill of Materials (BOM)</h2>
+    <p>Define the components needed to produce a finished product. Select the finished product and add components — search/select products, enter quantity and unit. A product can have only one active BOM at a time.</p>
+
+    <h2 id="s7-2">7.2 Work Orders</h2>
+    <p>Create production orders. Select the product to produce, enter the quantity, and set scheduled start/end dates. Status flow: Draft → Confirmed → Processing → Completed (or Cancelled). Use the "Next" button to advance the work order through stages. Once completed, you can log production output or send it to Quality Control.</p>
+
+    <h2 id="s7-3">7.3 Shop Floor Terminal</h2>
+    <p>Log production output and scrap. Select a work order (must be in Processing or Confirmed status), enter the output quantity and scrap quantity. The system creates inventory movements: production receipt for output and consumption for scrap. The work order is marked as completed.</p>
+
+    <h2 id="s7-4">7.4 Quality Control</h2>
+    <p>Record pass/fail inspections for completed work orders. Select a work order, enter inspection notes, and choose Pass or Fail. If passed, the work order stays completed. If failed, it returns to "processing" for rework.</p>
+
+    <!-- ========== SECTION 8: CONTACTS & PRODUCTS ========== -->
+    <h1 id="s8">8. Contacts &amp; Products</h1>
+    <p>The Contacts module manages customers, suppliers, and partners. Add contacts with company name, contact person, email, phone, and address. Contacts are shared across the system — used in Sales Orders, Purchase Orders, and Invoices.</p>
+    <p>The Products module is your product catalog. Add products with name, SKU, category, type, unit, cost price, selling price, and reorder level. Products sync with Inventory for stock tracking, Sales for pricing, and Supply Chain for purchasing. The category field supports autocomplete — type a new category or select from existing ones.</p>
+
+    <!-- ========== SECTION 9: ORDERS (UNIFIED VIEW) ========== -->
+    <h1 id="s9">9. Orders (Unified View)</h1>
+    <p>The Orders module shows all order types in one place: Sales Orders, Purchase Orders, and Work Orders. Use the filter dropdown to view a specific type or see all at once. Each row shows the order number, type, customer/supplier, date, total, and status. This is useful for getting a quick overview of all pending and completed orders across your business.</p>
+
+    <!-- ========== SECTION 10: REPORTS ========== -->
+    <h1 id="s10">10. Reports</h1>
+    <p>The Reports module has two tabs:</p>
+    <ul>
+        <li><strong>Saved Reports:</strong> Create custom report templates by selecting a module (Finance, HR, Sales, Inventory, Supply Chain, Manufacturing, or All) and a type (Tabular, Chart, Summary). Click "Run" to execute the report with live data. Results display as formatted tables with summary cards. You can print any report.</li>
+        <li><strong>Report Builder:</strong> Create a new report by entering a name, selecting the module and type, and adding a description. The report is saved and can be run anytime from the Saved Reports tab.</li>
+    </ul>
+    <p>Additionally, the Finance module has its own reports tab with Profit &amp; Loss, Balance Sheet, and Trial Balance — all using real-time account data.</p>
+
+    <!-- ========== SECTION 11: SETTINGS ========== -->
+    <h1 id="s11">11. Settings</h1>
+    <p>The Settings module contains 8 tabs for configuring your company's ERP experience.</p>
+
+    <h2 id="s11-1">11.1 Company Settings</h2>
+    <p>Set your company name, legal name, tax ID, registration number, currency (KSh, USD, EUR, GBP), contact email, phone, website, and physical address. These details appear on printed documents and reports.</p>
+
+    <h2 id="s11-2">11.2 User Management</h2>
+    <p>Invite staff members to your company. Enter their first name, last name, email, password, and role (Company Admin, Accountant, HR Manager, Sales Manager, Inventory Manager, or Staff). You can view all users, edit their details, or delete them. Each role has specific permissions that control which modules they can access.</p>
+
+    <h2 id="s11-3">11.3 Module Toggles</h2>
+    <p>Enable or disable modules for your company. Toggle switches let you turn modules on/off instantly. Modules not included in your plan appear grayed out with an "Upgrade plan" label. Changes take effect immediately — disabled modules are hidden from the sidebar and API access is blocked.</p>
+
+    <h2 id="s11-4">11.4 AI Settings</h2>
+    <p>Configure how AI works for your company. Choose between "Use HDM AI" (default) or "Bring Your Own Key". If using your own key, select the provider (OpenAI, Anthropic, DeepSeek, Google Gemini, Mistral, Cohere), enter the model name and API key. You can also set module scopes — select which modules the AI can access for analysis.</p>
+
+    <h2 id="s11-5">11.5 API Keys</h2>
+    <p>Generate outward API keys for external applications to access your ERP data. Each key has a name and module scopes. When you generate a key, copy it immediately — it won't be shown again. You can revoke keys at any time. The page also displays the API base URL and an example curl command for integration.</p>
+
+    <h2 id="s11-6">11.6 Billing &amp; Plans</h2>
+    <p>View your current plan, status, and subscription expiry date. See all available plans with pricing in your company's currency. To upgrade, contact support. (Upgrade functionality is restricted for security.)</p>
+
+    <h2 id="s11-7">11.7 Security</h2>
+    <p>Change your password by entering your current password and a new one. View and manage trusted devices — remove any device you no longer use. Trusted devices allow login without re-activation.</p>
+
+    <h2 id="s11-8">11.8 Backups</h2>
+    <p>Configure automatic backups with frequency (Daily, Weekly, Monthly), time, and retention settings (keep days, max backups). Click "Backup Now" to run an immediate backup. The backup history shows all past backups with download, share, and delete options.</p>
+
+    <!-- ========== SECTION 12: AI ASSISTANT ========== -->
+    <h1 id="s12">12. AI Assistant</h1>
+    <p>HDM ERP includes a built-in AI assistant. Click the sparkle button (bottom-right corner) to open the chat window. The AI can answer questions about your business data in real time:</p>
+    <ul>
+        <li>"What is my revenue this month?"</li>
+        <li>"Show low stock products"</li>
+        <li>"List all unpaid invoices"</li>
+        <li>"How is my business performing?"</li>
+        <li>"Give me a business health overview"</li>
+    </ul>
+    <p>The AI reads only the data you've allowed through module scopes. It displays monetary values in your company's set currency. You can clear the chat history anytime. If the AI is disabled by your administrator or not included in your plan, the sparkle button will not appear.</p>
+    <div class="tip"><strong>Tip:</strong> Be specific with your questions for the most accurate analysis. The AI analyzes real-time data from your ERP modules.</div>
+
+    <!-- ========== SECTION 13: DESKTOP & MOBILE APPS ========== -->
+    <h1 id="s13">13. Desktop &amp; Mobile Apps</h1>
+    <p><strong>Desktop App:</strong> Available for Windows, Mac, and Linux. The desktop app provides a native experience with a custom title bar (minimize, maximize, close), system tray icon, and auto-updater. It loads the full ERP interface and connects to the live server for data. Download from the landing page when enabled by the administrator.</p>
+    <p><strong>Mobile App:</strong> Available on Android and iOS. Features include a barcode scanner for quick product lookup, offline mode for areas with poor connectivity, biometric login (fingerprint/face), and push notifications for important alerts. Download from the Google Play Store or Apple App Store.</p>
+    <p>Both apps use the same credentials as the web version. Your data syncs in real time across all devices.</p>
+
+    <!-- ========== SECTION 14: FAQ ========== -->
+    <h1 id="s14">14. Frequently Asked Questions</h1>
+
+    <p><strong>Q: How do I reset my password?</strong><br>A: Contact your company admin. They can reset your password from Settings → Users.</p>
+    <p><strong>Q: Can I upgrade my plan later?</strong><br>A: Yes. Contact support to upgrade from any plan to a higher tier.</p>
+    <p><strong>Q: How secure is my data?</strong><br>A: All data is encrypted at rest and in transit. We use JWT authentication, role-based access control, and strict tenant isolation — your data is never accessible to other companies.</p>
+    <p><strong>Q: Can I export my data?</strong><br>A: Yes. All records can be exported to CSV or PDF. Backups can be scheduled automatically from Settings → Backups.</p>
+    <p><strong>Q: What currencies do you support?</strong><br>A: KSh (Kenyan Shilling), USD, EUR, and GBP. Your company admin can change the currency anytime from Settings → Company.</p>
+    <p><strong>Q: How does the AI assistant work?</strong><br>A: The AI analyzes your actual business data (invoices, products, employees, etc.) and answers questions in plain language. It respects module scopes set in AI Settings.</p>
+    <p><strong>Q: Can I use my own AI provider?</strong><br>A: Yes! In Settings → AI, switch to "Bring Your Own Key" and enter your API key from OpenAI, Anthropic, DeepSeek, Gemini, Mistral, or Cohere.</p>
+    <p><strong>Q: What is an outward API key?</strong><br>A: It allows external applications to access your ERP data securely. Generate keys from Settings → API Keys with specific module scopes.</p>
+
+    <!-- ========== SECTION 15: TROUBLESHOOTING ========== -->
+    <h1 id="s15">15. Troubleshooting</h1>
+
+    <p><strong>Issue: "Device not trusted" error</strong><br>You need to activate this device. Go to the activation page and enter your license key. If you lost your key, contact support.</p>
+    <p><strong>Issue: Module not appearing in sidebar</strong><br>The module may be disabled in your plan or toggled off in Settings → Modules. Check with your company admin.</p>
+    <p><strong>Issue: AI sparkle button not showing</strong><br>The AI may be disabled by the super admin or not included in your plan. Check Settings → AI.</p>
+    <p><strong>Issue: Page not loading or blank screen</strong><br>Clear your browser cache (Ctrl+Shift+Del), ensure cookies are enabled, and try a different browser. Check your internet connection.</p>
+    <p><strong>Issue: Invoice/bill not updating account balances</strong><br>Ensure you have accounts set up in Finance → Accounts. The system needs at least one Asset account and one Income/Expense account to post journal entries automatically.</p>
+    <p><strong>Issue: Login keeps redirecting</strong><br>Clear localStorage and sessionStorage in your browser, then try again. If using "Remember me", your token may have expired.</p>
+    <p><strong>Issue: Report shows no data</strong><br>Ensure you have records in the relevant module. Run a report only after adding data (invoices, products, employees, etc.).</p>
+
+</div>
+
+<div class="footer">
+    <p><strong>HDM ERP</strong> — Smart Business Management Powered by AI</p>
+    <p>© 2026 HDM ERP. All rights reserved. | Version 1.0 | May 2026</p>
+    <p>https://hdmerp.pxxl.click | support@hdmerp.com | +254 768 784 909</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "HDM ERP",
+    "slug": "hdm-erp-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#10B981",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hdmerp.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "HDM ERP uses camera access for barcode scanning.",
+        "NSFaceIDUsageDescription": "HDM ERP uses Face ID for secure authentication."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#10B981"
+      },
+      "package": "com.hdmerp.mobile",
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
+    },
+    "plugins": [
+      "expo-camera",
+      "expo-local-authentication",
+      "expo-notifications"
+    ],
+    "extra": {
+      "apiUrl": "https://hdmerpserver.pxxl.click/api",
+      "eas": {
+        "projectId": "412166fa-54c7-4e1e-9989-36f01e26cf60"
+      }
+    }
+  }
+}

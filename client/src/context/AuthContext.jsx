@@ -27,6 +27,11 @@ export const AuthProvider = ({ children }) => {
     setStorage('refreshToken', refreshToken, rememberMe);
     setStorage('user', JSON.stringify(userData), rememberMe);
 
+    if (rememberMe) {
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('rememberMe', 'true');
+    }
+
     api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     setToken(accessToken);
     setUser(userData);
@@ -58,13 +63,16 @@ export const AuthProvider = ({ children }) => {
     } catch { logout(); throw new Error('Session expired'); }
   }, []);
 
+  // Restore session on mount
   useEffect(() => {
     const storedToken = getStorage('accessToken');
     if (storedToken) {
       api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
       setToken(storedToken);
-      try { const storedUser = getStorage('user'); if (storedUser) setUser(JSON.parse(storedUser)); }
-      catch {}
+      try {
+        const storedUser = getStorage('user');
+        if (storedUser) setUser(JSON.parse(storedUser));
+      } catch {}
     }
     setLoading(false);
   }, []);
