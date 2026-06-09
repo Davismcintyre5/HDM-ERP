@@ -5,26 +5,28 @@ import RegistrationPage from '../pages/public/RegistrationPage';
 import PricingPage from '../pages/public/PricingPage';
 import FAQPage from '../pages/public/FAQPage';
 import HelpPage from '../pages/public/HelpPage';
+import ForgotPasswordPage from '../pages/public/ForgotPasswordPage';
+import ResetPasswordPage from '../pages/public/ResetPasswordPage';
+import ActivationPage from '../pages/public/ActivationPage';
+import CheckoutPage from '../pages/public/CheckoutPage';
 import PrivacyPolicyPage from '../pages/public/PrivacyPolicyPage';
 import TermsOfServicePage from '../pages/public/TermsOfServicePage';
 import LicensePage from '../pages/public/LicensePage';
 import CookiePolicyPage from '../pages/public/CookiePolicyPage';
 import AppLayout from '../components/layout/AppLayout';
 import ProtectedRoute from './ProtectedRoute';
-import CheckoutPage from '../pages/public/CheckoutPage';
-import ActivationPage from '../pages/public/ActivationPage';
 import DashboardPage from '../pages/dashboard/DashboardPage';
-import SettingsPage from '../pages/settings/SettingsPage';
-import ContactsPage from '../pages/contacts/ContactsPage';
-import ProductsPage from '../pages/products/ProductsPage';
+import FinancePage from '../pages/finance/FinancePage';
+import HRPage from '../pages/hr/HRPage';
 import SalesPage from '../pages/sales/SalesPage';
 import InventoryPage from '../pages/inventory/InventoryPage';
 import SupplyChainPage from '../pages/supplyChain/SupplyChainPage';
-import FinancePage from '../pages/finance/FinancePage';
-import HRPage from '../pages/hr/HRPage';
 import ManufacturingPage from '../pages/manufacturing/ManufacturingPage';
 import OrdersPage from '../pages/orders/OrdersPage';
+import ContactsPage from '../pages/contacts/ContactsPage';
+import ProductsPage from '../pages/products/ProductsPage';
 import ReportsPage from '../pages/reports/ReportsPage';
+import SettingsPage from '../pages/settings/SettingsPage';
 
 const AppRouter = () => (
   <Routes>
@@ -35,12 +37,14 @@ const AppRouter = () => (
     <Route path="/pricing" element={<PricingPage />} />
     <Route path="/faqs" element={<FAQPage />} />
     <Route path="/help" element={<HelpPage />} />
+    <Route path="/activate" element={<ActivationPage />} />
+    <Route path="/checkout" element={<CheckoutPage />} />
+    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+    <Route path="/reset-password" element={<ResetPasswordPage />} />
     <Route path="/legal/privacy" element={<PrivacyPolicyPage />} />
     <Route path="/legal/terms" element={<TermsOfServicePage />} />
     <Route path="/legal/license" element={<LicensePage />} />
     <Route path="/legal/cookies" element={<CookiePolicyPage />} />
-    <Route path="/checkout" element={<CheckoutPage />} />
-    <Route path="/activate" element={<ActivationPage />} />
 
     {/* Protected tenant routes */}
     <Route element={<ProtectedRoute />}>
@@ -56,11 +60,10 @@ const AppRouter = () => (
         <Route path="/contacts" element={<ContactsPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/reports" element={<ReportsPage />} />
-       <Route path="/settings/*" element={<SettingsPage />} />
+        <Route path="/settings/*" element={<SettingsPage />} />
       </Route>
     </Route>
 
-    {/* Fallback */}
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );

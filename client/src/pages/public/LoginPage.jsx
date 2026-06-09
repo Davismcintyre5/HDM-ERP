@@ -22,10 +22,7 @@ const LoginPage = () => {
   useEffect(() => {
     const savedEmail = localStorage.getItem('userEmail');
     const savedRemember = localStorage.getItem('rememberMe');
-    if (savedRemember === 'true' && savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
-    }
+    if (savedRemember === 'true' && savedEmail) { setEmail(savedEmail); setRememberMe(true); }
     let cancelled = false;
     api.get('/public/landing').then(res => {
       if (!cancelled) setContactInfo({ email: res.data.data?.contactEmail || '', phone: res.data.data?.contactPhone || '' });
@@ -40,31 +37,17 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) return setError('Email and password required');
-    setError('');
-    setLoading(true);
+    setError(''); setLoading(true);
     try {
       const result = await login(email, password, rememberMe);
-      if (result?.requiresActivation) {
-        navigate('/activate', { replace: true });
-        return;
-      }
-      if (rememberMe) {
-        localStorage.setItem('userEmail', email);
-        localStorage.setItem('rememberMe', 'true');
-      } else {
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('rememberMe');
-      }
+      if (result?.requiresActivation) { navigate('/activate', { replace: true }); return; }
+      if (rememberMe) { localStorage.setItem('userEmail', email); localStorage.setItem('rememberMe', 'true'); }
+      else { localStorage.removeItem('userEmail'); localStorage.removeItem('rememberMe'); }
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      if (err.response?.data?.requiresActivation) {
-        navigate('/activate', { replace: true });
-        return;
-      }
+      if (err.response?.data?.requiresActivation) { navigate('/activate', { replace: true }); return; }
       setError(err.response?.data?.message || 'Invalid credentials');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
@@ -75,7 +58,10 @@ const LoginPage = () => {
         <form onSubmit={handleLogin} className="space-y-4">
           <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label><Input type="email" value={email} onChange={e => setEmail(e.target.value)} required /></div>
           <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label><Input type="password" value={password} onChange={e => setPassword(e.target.value)} required /></div>
-          <div className="flex items-center"><Checkbox label="Remember me" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} /></div>
+          <div className="flex items-center justify-between">
+            <Checkbox label="Remember me" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />
+            <Link to="/forgot-password" className="text-sm text-gray-400 hover:text-primary-500">Forgot password?</Link>
+          </div>
           <Button type="submit" className="w-full" disabled={loading}>{loading ? <Spinner /> : 'Login'}</Button>
         </form>
         <div className="mt-6 text-center space-y-2 text-sm">
