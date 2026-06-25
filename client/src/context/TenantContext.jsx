@@ -1,58 +1,57 @@
-import { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { useAuth } from './AuthContext';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { getModules } from '../api/tenant/companyApi';
 import api from '../api/axios';
 
 const TenantContext = createContext(null);
 
 export const TenantProvider = ({ children }) => {
-  const { isAuthenticated, token } = useAuth();
   const [tenant, setTenant] = useState(null);
   const [modules, setModules] = useState({});
-  const [limits, setLimits] = useState({});
-  const [plan, setPlan] = useState(null);
-  const fetchedRef = useRef(false);
-  const lastFetchRef = useRef(0);
-
-  const fetchTenantData = useCallback(async () => {
-    try {
-      const [companyRes, modulesRes] = await Promise.all([
-        api.get('/tenant/company'),
-        api.get('/tenant/company/modules')
-      ]);
-      setTenant(companyRes.data.data);
-      setModules(modulesRes.data.data.modules || modulesRes.data.data.planModules || {});
-      setLimits(modulesRes.data.data.limits || {});
-      setPlan(modulesRes.data.data.plan);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated || !token) {
-      setTenant(null);
-      setModules({});
-      setLimits({});
-      setPlan(null);
-      fetchedRef.current = false;
-      return;
-    }
-
-    // Cache for 5 minutes
-    if (Date.now() - lastFetchRef.current < 300000) return;
-    lastFetchRef.current = Date.now();
-    fetchTenantData();
-  }, [isAuthenticated, token, fetchTenantData]);
+  const [plan, setPlan] = useState('');
+  const [loaded, setLoaded] = useState(false);
 
   const refreshModules = useCallback(async () => {
     try {
-      const modulesRes = await api.get('/tenant/company/modules');
-      setModules(modulesRes.data.data.modules || modulesRes.data.data.planModules || {});
-      setPlan(modulesRes.data.data.plan);
-      lastFetchRef.current = Date.now();
-    } catch {}
+      const res = await getModules();
+      const data = res.data.data;
+      setModules(data.modules || {});
+      setPlan(data.plan || '');
+      setTenant(prev => prev || {});
+      return data;
+    } catch (err) {
+      console.error('Failed to refresh modules:', err);
+    }
   }, []);
 
+  // Initial load
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    if (!token) {
+      setLoaded(true);
+      return;
+    }
+
+    refreshModules().finally(() => setLoaded(true));
+
+    // Listen for storage changes (other tabs)
+    const handleStorage = (e) => {
+      if (e.key === 'accessToken' || e.key === null) {
+        refreshModules();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [refreshModules]);
+
+  // Refresh after any settings change — listen for custom event
+  useEffect(() => {
+    const handleModuleChange = () => refreshModules();
+    window.addEventListener('modules-updated', handleModuleChange);
+    return () => window.removeEventListener('modules-updated', handleModuleChange);
+  }, [refreshModules]);
+
   return (
-    <TenantContext.Provider value={{ tenant, modules, limits, plan, refreshModules }}>
+    <TenantContext.Provider value={{ tenant, setTenant, modules, plan, refreshModules, loaded }}>
       {children}
     </TenantContext.Provider>
   );

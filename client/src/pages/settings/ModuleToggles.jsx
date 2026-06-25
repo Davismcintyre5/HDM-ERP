@@ -15,27 +15,35 @@ const moduleList = [
   { key: 'supplyChain', label: 'Supply Chain', icon: '🚚' },
   { key: 'orders', label: 'Orders', icon: '📋' },
   { key: 'manufacturing', label: 'Manufacturing', icon: '🏭' },
+  { key: 'crm', label: 'CRM Pipeline', icon: '🎯' },
+  { key: 'projects', label: 'Projects & Tasks', icon: '📐' },
+  { key: 'assets', label: 'Asset Management', icon: '🔧' },
   { key: 'contacts', label: 'Contacts', icon: '📇' },
   { key: 'products', label: 'Products', icon: '🏷️' },
-  { key: 'reports', label: 'Reports', icon: '📊' },
+  { key: 'communications', label: 'Communications', icon: '✉️' },
+  { key: 'reports', label: 'Reports', icon: '📈' },
   { key: 'settings', label: 'Settings', icon: '⚙️' },
-  { key: 'dashboard', label: 'Dashboard', icon: '📈' },
+  { key: 'dashboard', label: 'Dashboard', icon: '📊' },
 ];
 
 const ModuleToggles = () => {
-  const { modules: activeModules, plan, refreshModules } = useTenant();
+  const { plan, refreshModules } = useTenant();
   const [planModules, setPlanModules] = useState({});
   const [localModules, setLocalModules] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     getModules()
       .then(res => {
-        setPlanModules(res.data.data?.planModules || {});
-        setLocalModules(res.data.data?.modules || {});
+        const data = res.data.data || {};
+        setPlanModules(data.planModules || {});
+        // Merge plan defaults with tenant overrides
+        const merged = { ...(data.planModules || {}), ...(data.modules || {}) };
+        setLocalModules(merged);
       })
+      .catch(() => setMessage({ type: 'error', text: 'Failed to load modules' }))
       .finally(() => setLoading(false));
   }, []);
 
@@ -44,16 +52,22 @@ const ModuleToggles = () => {
 
   const handleToggle = async (key) => {
     if (!isInPlan(key)) return;
-    const newState = { ...localModules, [key]: !isEnabled(key) };
-    setLocalModules(newState);
+
+    const newModules = { ...localModules, [key]: !isEnabled(key) };
+    setLocalModules(newModules); // Optimistic update
+
     setSaving(true);
     try {
-      await toggleModules(newState);
-      setMessage({ type: 'success', text: `${moduleList.find(m => m.key === key)?.label} ${newState[key] !== false ? 'enabled' : 'disabled'}.` });
+      await toggleModules(newModules);
+      // Dispatch event so sidebar updates instantly
+      window.dispatchEvent(new CustomEvent('modules-updated'));
+      // Also update context
       if (refreshModules) refreshModules();
-    } catch {
-      setLocalModules({ ...localModules });
-      setMessage({ type: 'error', text: 'Failed to update.' });
+      setMessage({ type: 'success', text: `${moduleList.find(m => m.key === key)?.label} ${newModules[key] ? 'enabled' : 'disabled'}.` });
+    } catch (err) {
+      // Revert on error
+      setLocalModules(localModules);
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to update' });
     } finally {
       setSaving(false);
     }
@@ -67,7 +81,7 @@ const ModuleToggles = () => {
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
         Enable or disable modules for your company. Grayed out modules are not available on your <strong>{plan}</strong> plan.
       </p>
-      {message && <Alert variant={message.type} message={message.text} onClose={() => setMessage('')} />}
+      {message && <Alert variant={message.type} message={message.text} onClose={() => setMessage(null)} />}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {moduleList.map(mod => (

@@ -8,7 +8,8 @@ import Spinner from '../../components/ui/Spinner';
 import Alert from '../../components/ui/Alert';
 import Modal from '../../components/ui/Modal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
-import { Plus, Edit3, Trash2 } from 'lucide-react';
+import { Plus, Printer, Edit3, Trash2, Eye } from 'lucide-react';
+import { printContent } from '../../utils/printUtils';
 import formatCurrency from '../../utils/formatCurrency';
 
 const types = ['asset', 'liability', 'equity', 'income', 'expense', 'cost_of_sales'];
@@ -20,11 +21,17 @@ const AccountsTab = () => {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [viewId, setViewId] = useState(null);
   const [form, setForm] = useState({ code: '', name: '', type: 'asset', description: '', openingBalance: 0 });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
 
-  useEffect(() => { getAccounts().then(res => setAccounts(res.data.data || [])).finally(() => setLoading(false)); }, []);
+  const fetchAccounts = () => getAccounts().then(res => setAccounts(res.data.data || []));
+
+  useEffect(() => { fetchAccounts().finally(() => setLoading(false)); }, []);
+
+  const openEdit = (a) => { setEditId(a._id); setForm(a); setShowForm(true); };
+  const openNew = () => { setEditId(null); setForm({ code: '', name: '', type: 'asset', description: '', openingBalance: 0 }); setShowForm(true); };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -34,21 +41,35 @@ const AccountsTab = () => {
       if (editId) await updateAccount(editId, form);
       else await createAccount(form);
       setShowForm(false); setEditId(null); setForm({ code: '', name: '', type: 'asset', description: '', openingBalance: 0 });
-      getAccounts().then(res => setAccounts(res.data.data || []));
-      setMessage({ type: 'success', text: 'Account saved.' });
+      fetchAccounts();
+      setMessage({ type: 'success', text: editId ? 'Account updated.' : 'Account created.' });
     } catch (err) { setMessage({ type: 'error', text: err.response?.data?.message || 'Failed.' }); }
     finally { setSaving(false); }
   };
 
-  const handleDelete = async () => { try { await deleteAccount(deleteId); setDeleteId(null); getAccounts().then(res => setAccounts(res.data.data || [])); } catch {} };
+  const handleDelete = async () => { try { await deleteAccount(deleteId); setDeleteId(null); fetchAccounts(); } catch {} };
+
+  const handlePrint = (a) => {
+    const html = `<h2 style="text-align:center;color:#10B981;">ACCOUNT DETAIL</h2>
+      <table style="width:100%;margin-top:15px;font-size:13px;">
+        <tr><td style="width:140px;font-weight:bold;padding:5px 0;">Code:</td><td>${a.code}</td></tr>
+        <tr><td style="font-weight:bold;padding:5px 0;">Name:</td><td>${a.name}</td></tr>
+        <tr><td style="font-weight:bold;padding:5px 0;">Type:</td><td>${a.type}</td></tr>
+        <tr><td style="font-weight:bold;padding:5px 0;">Current Balance:</td><td style="color:#10B981;font-weight:bold;">${formatCurrency(a.currentBalance || 0)}</td></tr>
+        ${a.description ? `<tr><td style="font-weight:bold;padding:5px 0;">Description:</td><td>${a.description}</td></tr>` : ''}
+      </table>`;
+    printContent(html, { title: `Account ${a.code}` });
+  };
 
   if (loading) return <Spinner />;
+
+  const viewedAccount = accounts.find(a => a._id === viewId);
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-gray-500">{accounts.length} accounts</p>
-        <Button size="sm" onClick={() => { setEditId(null); setForm({ code: '', name: '', type: 'asset', description: '', openingBalance: 0 }); setShowForm(true); }}><Plus size={14} className="mr-1" /> Add Account</Button>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{accounts.length} accounts</p>
+        <Button size="sm" onClick={openNew}><Plus size={14} className="mr-1" /> Add Account</Button>
       </div>
       {message && <Alert variant={message.type} message={message.text} onClose={() => setMessage('')} />}
       <div className="overflow-x-auto">
@@ -57,13 +78,17 @@ const AccountsTab = () => {
           <tbody>
             {accounts.map(a => (
               <tr key={a._id} className="border-b border-gray-100 dark:border-gray-700/50">
-                <td className="py-2 font-mono text-xs text-gray-500">{a.code}</td>
+                <td className="py-2 font-mono text-xs text-gray-500 dark:text-gray-400">{a.code}</td>
                 <td className="py-2 font-medium text-gray-900 dark:text-white">{a.name}</td>
                 <td className="py-2"><Badge variant={typeColors[a.type] || 'default'}>{a.type}</Badge></td>
                 <td className="py-2 text-right text-primary-500 font-medium">{formatCurrency(a.currentBalance || 0)}</td>
                 <td className="py-2 text-right">
-                  <Button size="sm" variant="ghost" onClick={() => { setEditId(a._id); setForm(a); setShowForm(true); }}><Edit3 size={12} /></Button>
-                  <Button size="sm" variant="ghost" className="text-red-500" onClick={() => setDeleteId(a._id)}><Trash2 size={12} /></Button>
+                  <div className="flex justify-end gap-0.5">
+                    <Button size="sm" variant="ghost" onClick={() => handlePrint(a)} title="Print"><Printer size={12} /></Button>
+                    <Button size="sm" variant="ghost" onClick={() => setViewId(a._id)} title="View"><Eye size={12} /></Button>
+                    <Button size="sm" variant="ghost" onClick={() => openEdit(a)} title="Edit"><Edit3 size={12} /></Button>
+                    <Button size="sm" variant="ghost" className="text-red-500" onClick={() => setDeleteId(a._id)} title="Delete"><Trash2 size={12} /></Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -71,6 +96,22 @@ const AccountsTab = () => {
         </table>
       </div>
 
+      {/* View Modal */}
+      <Modal open={!!viewId} onClose={() => setViewId(null)} title={`Account ${viewedAccount?.code || ''}`}>
+        {viewedAccount && (
+          <div className="space-y-2 text-sm">
+            <p><strong>Code:</strong> {viewedAccount.code}</p>
+            <p><strong>Name:</strong> {viewedAccount.name}</p>
+            <p><strong>Type:</strong> <Badge variant={typeColors[viewedAccount.type]}>{viewedAccount.type}</Badge></p>
+            <p><strong>Current Balance:</strong> <span className="text-primary-500 font-bold">{formatCurrency(viewedAccount.currentBalance || 0)}</span></p>
+            <p><strong>Opening Balance:</strong> {formatCurrency(viewedAccount.openingBalance || 0)}</p>
+            {viewedAccount.description && <p><strong>Description:</strong> {viewedAccount.description}</p>}
+            <p className="text-xs text-gray-400">Created: {formatCurrency(viewedAccount.createdAt)}</p>
+          </div>
+        )}
+      </Modal>
+
+      {/* Form Modal */}
       <Modal open={showForm} onClose={() => setShowForm(false)} title={editId ? 'Edit Account' : 'Add Account'}>
         <form onSubmit={handleSave} className="space-y-3">
           <div className="grid grid-cols-2 gap-2">
@@ -80,9 +121,10 @@ const AccountsTab = () => {
           <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">Type</label><Select value={form.type} onChange={e => setForm(prev => ({ ...prev, type: e.target.value }))}>{types.map(t => <option key={t} value={t}>{t}</option>)}</Select></div>
           <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">Description</label><Input value={form.description} onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))} /></div>
           <div><label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-0.5">Opening Balance</label><Input type="number" step="0.01" value={form.openingBalance} onChange={e => setForm(prev => ({ ...prev, openingBalance: parseFloat(e.target.value) || 0 }))} /></div>
-          <div className="flex gap-2"><Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="flex-1">Cancel</Button><Button type="submit" disabled={saving} className="flex-1">Save</Button></div>
+          <div className="flex gap-2"><Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="flex-1">Cancel</Button><Button type="submit" disabled={saving} className="flex-1">{editId ? 'Update' : 'Save'}</Button></div>
         </form>
       </Modal>
+
       <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={handleDelete} title="Delete Account" message="Are you sure?" />
     </div>
   );

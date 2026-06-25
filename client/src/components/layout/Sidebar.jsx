@@ -2,21 +2,27 @@ import { Link, useLocation } from 'react-router-dom';
 import { useSidebar } from '../../context/SidebarContext';
 import { useTenant } from '../../context/TenantContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useAI } from '../../context/AIContext';
 import clsx from 'clsx';
 import {
-  LayoutDashboard, Banknote, Users, ShoppingCart, Package, Truck, Factory, ClipboardList,
-  Contact, Box, BarChart3, Settings, Sun, Moon, ChevronLeft, ChevronRight, X
+  LayoutDashboard, Banknote, Users, ShoppingCart, Package, Truck, Factory, MessageSquare, ClipboardList,
+  Contact, Box, BarChart3, Settings, Sun, Moon, ChevronLeft, ChevronRight, X, Sparkles,
+  Target, ClipboardCheck, Wrench
 } from 'lucide-react';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', module: 'dashboard' },
   { to: '/finance/accounts', icon: Banknote, label: 'Finance', module: 'finance' },
   { to: '/hr/employees', icon: Users, label: 'HR', module: 'hr' },
+  { to: '/communications', icon: MessageSquare, label: 'Communications', module: 'communications' },
   { to: '/sales/orders', icon: ShoppingCart, label: 'Sales', module: 'sales' },
+  { to: '/crm', icon: Target, label: 'CRM', module: 'crm' },
+  { to: '/projects', icon: ClipboardCheck, label: 'Projects', module: 'projects' },
   { to: '/inventory/stock', icon: Package, label: 'Inventory', module: 'inventory' },
   { to: '/supply-chain/purchase-orders', icon: Truck, label: 'Supply Chain', module: 'supplyChain' },
   { to: '/orders', icon: ClipboardList, label: 'Orders', module: 'orders' },
   { to: '/manufacturing/boms', icon: Factory, label: 'Manufacturing', module: 'manufacturing' },
+  { to: '/assets', icon: Wrench, label: 'Assets', module: 'assets' },
   { to: '/contacts', icon: Contact, label: 'Contacts', module: 'contacts' },
   { to: '/products', icon: Box, label: 'Products', module: 'products' },
   { to: '/reports', icon: BarChart3, label: 'Reports', module: 'reports' },
@@ -27,9 +33,15 @@ const Sidebar = () => {
   const { collapsed, toggle, mobileOpen, toggleMobile } = useSidebar();
   const { modules, tenant } = useTenant();
   const { theme, toggleTheme } = useTheme();
+  const { toggleChat, aiEnabled, checked } = useAI();
   const location = useLocation();
 
   const filtered = navItems.filter((item) => modules[item.module] !== false);
+
+  const handleAIChat = () => {
+    toggleChat();
+    if (mobileOpen) toggleMobile();
+  };
 
   return (
     <>
@@ -78,6 +90,19 @@ const Sidebar = () => {
             </Link>
           ))}
         </nav>
+
+        {/* AI Assistant Button */}
+        {checked && aiEnabled && (
+          <div className="px-2 py-1">
+            <button
+              onClick={handleAIChat}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+            >
+              <Sparkles size={18} />
+              {(!collapsed || mobileOpen) && <span>AI Assistant</span>}
+            </button>
+          </div>
+        )}
 
         {/* Theme Toggle */}
         <div className="p-2 border-t border-gray-200 dark:border-gray-800">

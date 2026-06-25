@@ -27,6 +27,11 @@ import ContactsPage from '../pages/contacts/ContactsPage';
 import ProductsPage from '../pages/products/ProductsPage';
 import ReportsPage from '../pages/reports/ReportsPage';
 import SettingsPage from '../pages/settings/SettingsPage';
+import CommunicationsPage from '../pages/communications/CommunicationsPage';
+import CRMPage from '../pages/crm/CRMPage';
+import ProjectsPage from '../pages/projects/ProjectsPage';
+import AssetsPage from '../pages/assets/AssetsPage';
+
 
 const AppRouter = () => (
   <Routes>
@@ -53,13 +58,17 @@ const AppRouter = () => (
         <Route path="/finance/*" element={<FinancePage />} />
         <Route path="/hr/*" element={<HRPage />} />
         <Route path="/sales/*" element={<SalesPage />} />
+        <Route path="/crm" element={<CRMPage />} />
+        <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/inventory/*" element={<InventoryPage />} />
         <Route path="/supply-chain/*" element={<SupplyChainPage />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/manufacturing/*" element={<ManufacturingPage />} />
+        <Route path="/assets" element={<AssetsPage />} />
         <Route path="/contacts" element={<ContactsPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/communications" element={<CommunicationsPage />} />
         <Route path="/settings/*" element={<SettingsPage />} />
       </Route>
     </Route>

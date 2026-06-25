@@ -11,7 +11,7 @@ import { Key, Trash2, Plus, Copy, Link, Terminal, Check } from 'lucide-react';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'https://hdmerpserver.pxxl.click/api').replace(/\/api$/, '') + '/api';
 
-const modules = ['finance', 'hr', 'sales', 'inventory', 'supplyChain', 'manufacturing', 'contacts', 'products', 'reports'];
+const modules = ['finance', 'hr', 'sales', 'inventory', 'supplyChain', 'manufacturing', 'contacts', 'products', 'reports', 'communications', 'crm', 'projects', 'assets'];
 
 const OutwardAPIKeys = () => {
   const [keys, setKeys] = useState([]);

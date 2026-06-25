@@ -1,11 +1,20 @@
-import Button from '../ui/Button';
 import formatCurrency from '../../utils/formatCurrency';
 import { Check, X } from 'lucide-react';
 
 const moduleLabels = {
-  finance: 'Finance', hr: 'HR', sales: 'Sales', inventory: 'Inventory',
-  supplyChain: 'Supply Chain', orders: 'Unified Orders', manufacturing: 'Manufacturing',
-  contacts: 'Contacts', products: 'Products', reports: 'Reports',
+  finance: 'Finance',
+  hr: 'HR',
+  sales: 'Sales',
+  inventory: 'Inventory',
+  supplyChain: 'Supply Chain',
+  orders: 'Unified Orders',
+  manufacturing: 'Manufacturing',
+  contacts: 'Contacts',
+  products: 'Products',
+  reports: 'Reports',
+  crm: 'CRM Pipeline',
+  projects: 'Projects & Tasks',
+  assets: 'Asset Management',
 };
 
 const planColors = {
@@ -57,9 +66,10 @@ const PlanCard = ({ plan, onSelect, selected }) => {
               <span className={modules[key] ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 dark:text-gray-500'}>{label}</span>
             </div>
           ))}
-          {limits.aiWrite && <div className="flex items-center gap-1.5 text-primary-500"><Check size={11} /> AI Write</div>}
-          {limits.whiteLabel && <div className="flex items-center gap-1.5 text-primary-500"><Check size={11} /> White Label</div>}
         </div>
+
+        {limits.aiWrite && <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400"><Check size={11} className="text-primary-500 shrink-0" /> AI Write</div>}
+        {limits.whiteLabel && <div className="flex items-center gap-1.5 text-gray-600 dark:text-gray-400"><Check size={11} className="text-primary-500 shrink-0" /> White Label</div>}
       </div>
 
       <button

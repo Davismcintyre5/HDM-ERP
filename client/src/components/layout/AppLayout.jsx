@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
-import SparkleButton from '../ai/SparkleButton';
 import AIChatWidget from '../ai/AIChatWidget';
 import TitleBar from './TitleBar';
 
@@ -19,7 +18,6 @@ const AppLayout = () => (
         </main>
       </div>
     </div>
-    <SparkleButton />
     <AIChatWidget />
   </div>
 );
