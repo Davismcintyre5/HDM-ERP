@@ -4,6 +4,7 @@ import LoginPage from '../pages/public/LoginPage';
 import RegistrationPage from '../pages/public/RegistrationPage';
 import PricingPage from '../pages/public/PricingPage';
 import FAQPage from '../pages/public/FAQPage';
+import RenewPage from '../pages/public/RenewPage';
 import HelpPage from '../pages/public/HelpPage';
 import ForgotPasswordPage from '../pages/public/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/public/ResetPasswordPage';
@@ -42,6 +43,7 @@ const AppRouter = () => (
     <Route path="/pricing" element={<PricingPage />} />
     <Route path="/faqs" element={<FAQPage />} />
     <Route path="/help" element={<HelpPage />} />
+    <Route path="/renew" element={<RenewPage />} />
     <Route path="/activate" element={<ActivationPage />} />
     <Route path="/checkout" element={<CheckoutPage />} />
     <Route path="/forgot-password" element={<ForgotPasswordPage />} />

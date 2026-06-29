@@ -42,6 +42,40 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
+
+    // Handle 403 - Plan/Trial expiry
+    if (error.response?.status === 403) {
+      const code = error.response?.data?.code;
+      const message = error.response?.data?.message;
+
+      if (code === 'TRIAL_EXPIRED') {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (token) sessionStorage.setItem('renew_token', token);
+        localStorage.setItem('trial_expired', 'true');
+        localStorage.setItem('expiry_message', message || 'Your free trial has ended.');
+        window.location.href = '/renew';
+        return Promise.reject(error);
+      }
+
+      if (code === 'SUBSCRIPTION_EXPIRED') {
+        const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+        if (token) sessionStorage.setItem('renew_token', token);
+        localStorage.setItem('subscription_expired', 'true');
+        localStorage.setItem('expiry_message', message || 'Your subscription has expired.');
+        window.location.href = '/renew';
+        return Promise.reject(error);
+      }
+
+      if (code === 'MODULE_NOT_IN_PLAN') {
+        console.warn('Module not available on current plan:', message);
+      }
+
+      if (code === 'MODULE_DISABLED') {
+        console.warn('Module disabled by tenant:', message);
+      }
+    }
+
+    // Handle 401 - Token refresh
     if (error.response?.status === 401 && !original._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

@@ -30,6 +30,10 @@ const InvoicesTab = () => {
   const [form, setForm] = useState({ customer: '', customerName: '', invoiceDate: new Date().toISOString().split('T')[0], dueDate: '', items: [], notes: '' });
   const [saving, setSaving] = useState(false);
 
+  // Send email overlay
+  const [sendOverlay, setSendOverlay] = useState(null);
+  const [sendEmailInput, setSendEmailInput] = useState('');
+
   const fetchInvoices = async () => {
     setRefreshing(true);
     try {
@@ -116,6 +120,34 @@ const InvoicesTab = () => {
     }
   };
 
+  const handleSendClick = (inv) => {
+    const customerEmail = inv.customer?.email || inv.customer?.contactEmail || '';
+    if (customerEmail) {
+      setSendEmailInput(customerEmail);
+    } else {
+      setSendEmailInput('');
+    }
+    setSendOverlay(inv);
+  };
+
+  const handleConfirmSend = async () => {
+    if (!sendEmailInput.trim()) {
+      setMessage({ type: 'error', text: 'Please enter an email address' });
+      return;
+    }
+    if (!sendOverlay) return;
+
+    try {
+      await updateInvoiceStatus(sendOverlay._id, 'sent');
+      setSendOverlay(null);
+      setSendEmailInput('');
+      setMessage({ type: 'success', text: `Invoice sent to ${sendEmailInput}` });
+      await fetchInvoices();
+    } catch (err) {
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to send invoice' });
+    }
+  };
+
   const advanceStatus = async (id, current) => {
     const idx = statusFlow.indexOf(current);
     if (idx < statusFlow.length - 1) {
@@ -177,7 +209,7 @@ const InvoicesTab = () => {
                       <>
                         <Button size="sm" variant="ghost" onClick={() => openEdit(inv)} title="Edit"><Edit3 size={12} /></Button>
                         <Button size="sm" variant="ghost" className="text-red-500" onClick={() => setDeleteId(inv._id)} title="Delete"><Trash2 size={12} /></Button>
-                        <Button size="sm" variant="ghost" className="text-green-600" onClick={() => advanceStatus(inv._id, inv.status)} title="Send"><Send size={12} /></Button>
+                        <Button size="sm" variant="ghost" className="text-green-600" onClick={() => handleSendClick(inv)} title="Send"><Send size={12} /></Button>
                       </>
                     )}
                     {inv.status === 'sent' && (
@@ -193,6 +225,30 @@ const InvoicesTab = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Send Email Overlay */}
+      {sendOverlay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSendOverlay(null)}>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-sm mx-4" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Send Invoice</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Invoice <strong>{sendOverlay.invoiceNumber}</strong> to <strong>{sendOverlay.customer?.companyName || sendOverlay.customerName || 'Customer'}</strong>
+            </p>
+            <Input
+              label="Recipient Email"
+              type="email"
+              value={sendEmailInput}
+              onChange={e => setSendEmailInput(e.target.value)}
+              placeholder="customer@example.com"
+              required
+            />
+            <div className="flex gap-2 mt-4">
+              <Button variant="ghost" onClick={() => { setSendOverlay(null); setSendEmailInput(''); }} className="flex-1">Cancel</Button>
+              <Button onClick={handleConfirmSend} className="flex-1">Send Invoice</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* View Modal */}
       <Modal open={!!viewId} onClose={() => setViewId(null)} title={`Invoice ${viewedInvoice?.invoiceNumber || ''}`}>
